@@ -1,6 +1,7 @@
 package repositories_test
 
 import (
+	"fmt"
 	"log"
 	"testing"
 
@@ -44,6 +45,17 @@ func TestVideoRepositoryMethods(t *testing.T) {
 		//Assert
 		require.NotNil(t, entity)
 		require.Nil(t, err)
-		require.IsType(t, insertedVideoUUID, entity.GetId())
+		require.Equal(t, insertedVideoUUID, entity.GetId())
+	})
+
+	t.Run("Find_InvalidInsertedVideoUUID_ShouldReturnError", func(t *testing.T) {
+		//Arrange
+		invalidID := uuid.NewV4().String()
+		errMsg := fmt.Sprintf("video ID '%v' doest not exist", invalidID)
+		//Act
+		entity, err := videoRepo.Find(invalidID)
+		//Assert
+		require.Nil(t, entity)
+		require.EqualError(t, err, errMsg)
 	})
 }
