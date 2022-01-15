@@ -12,9 +12,9 @@ func init() {
 }
 
 type Entity struct {
-	ID        string    `valid:"uuid"`
-	CreatedAt time.Time `valid:"-"`
-	UpdatedAt time.Time `valid:"-"`
+	ID        string    `json:"id" valid:"uuid" gorm:"uuid;primary_key"`
+	CreatedAt time.Time `json:"created_at" valid:"-"`
+	UpdatedAt time.Time `json:"updated_at" valid:"-"`
 }
 
 func NewEntity() *Entity {

@@ -11,8 +11,9 @@ func init() {
 
 type Video struct {
 	common.Entity `valid:"required"`
-	ResourceID    string `valid:"uuid"`
-	FilePath      string `valid:"required"`
+	ResourceID    string `json:"resource_id" valid:"uuid"`
+	FilePath      string `json:"file_path" valid:"required"`
+	Jobs          []*Job `json:"-" valid:"-" gorm:"foreignKey:VideoID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 func NewVideo(rID, file string) *Video {
@@ -21,4 +22,8 @@ func NewVideo(rID, file string) *Video {
 		ResourceID: rID,
 		FilePath:   file,
 	}
+}
+
+func (v *Video) IsEntity() bool {
+	return true
 }
