@@ -14,12 +14,12 @@ import (
 )
 
 type VideoService struct {
-	Video           *entities.Video
-	VideoRepository repositories.VideoRepository
+	video           *entities.Video
+	videoRepository repositories.VideoRepository
 }
 
-func NewVideoService() VideoService {
-	return VideoService{}
+func NewVideoService(v *entities.Video, repo repositories.VideoRepository) VideoService {
+	return VideoService{v, repo}
 }
 
 func (vs *VideoService) Download(bucketName string) error {
@@ -28,7 +28,7 @@ func (vs *VideoService) Download(bucketName string) error {
 	if err != nil {
 		return err
 	}
-	reader, err := client.Bucket(bucketName).Object(vs.Video.FilePath).NewReader(ctx)
+	reader, err := client.Bucket(bucketName).Object(vs.video.FilePath).NewReader(ctx)
 	if err != nil {
 		return err
 	}
@@ -38,7 +38,7 @@ func (vs *VideoService) Download(bucketName string) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	path := fmt.Sprintf(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.Video.ID, ".mp4")
+	path := os.Getenv("LOCAL_STORAGE_PATH") + "/" + vs.video.ID + ".mp4"
 	file, err := os.Create(path)
 	if err != nil {
 		return err
@@ -47,18 +47,18 @@ func (vs *VideoService) Download(bucketName string) error {
 	if _, err := file.Write(body); err != nil {
 		return err
 	}
-	log.Printf("video '%v' has been stored", vs.Video.ID)
+	log.Printf("video '%v' has been stored", vs.video.ID)
 	return nil
 }
 
 func (vs *VideoService) Fragment() error {
-	path := fmt.Sprintf(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.Video.ID)
+	path := os.Getenv("LOCAL_STORAGE_PATH") + "/" + vs.video.ID
 	if err := os.Mkdir(path, os.ModePerm); err != nil {
 		return err
 	}
 
-	source := fmt.Sprintf(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.Video.ID, ".mp4")
-	target := fmt.Sprintf(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.Video.ID, ".frag")
+	source := fmt.Sprintf(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.video.ID, ".mp4")
+	target := fmt.Sprintf(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.video.ID, ".frag")
 
 	cmd := exec.CommandContext(context.Background(), "mp4fragment", source, target)
 	output, err := cmd.CombinedOutput()
