@@ -1,10 +1,8 @@
 package entities
 
 import (
-	"time"
-
 	"github.com/asaskevich/govalidator"
-	uuid "github.com/satori/go.uuid"
+	"github.com/xStrato/video-encoder-golang/domain/common"
 )
 
 func init() {
@@ -12,24 +10,15 @@ func init() {
 }
 
 type Video struct {
-	ID         string    `valid:"uuid"`
-	ResourceID string    `valid:"uuid"`
-	FilePath   string    `valid:"required"`
-	CreatedAt  time.Time `valid:"-"`
+	common.Entity `valid:"required"`
+	ResourceID    string `valid:"uuid"`
+	FilePath      string `valid:"required"`
 }
 
 func NewVideo(rID, file string) *Video {
 	return &Video{
-		ID:         uuid.NewV4().String(),
+		Entity:     *common.NewEntity(),
 		ResourceID: rID,
 		FilePath:   file,
-		CreatedAt:  time.Now(),
 	}
-}
-
-func (v *Video) IsValid() error {
-	if valid, err := govalidator.ValidateStruct(v); !valid {
-		return err
-	}
-	return nil
 }
