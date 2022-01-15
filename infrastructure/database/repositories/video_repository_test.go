@@ -14,7 +14,7 @@ import (
 )
 
 func TestVideoRepositoryMethods(t *testing.T) {
-	db, err := gorm.Open(sqlite.Open("app_test.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
