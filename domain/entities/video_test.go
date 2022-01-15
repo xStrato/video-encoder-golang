@@ -26,7 +26,7 @@ func TestVideoStructValidations(t *testing.T) {
 		//Act
 		err := video.IsValid()
 		//Assert
-		require.EqualError(t, err, "ID: abc does not validate as uuid")
+		require.EqualError(t, err, "id: abc does not validate as uuid")
 	})
 
 	t.Run("IsValid_ValidStructConstruction_ShouldNotReturnError", func(t *testing.T) {

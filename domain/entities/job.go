@@ -27,6 +27,6 @@ func NewJob(output, status string, v *Video) *Job {
 	}
 }
 
-func (j *Job) IsEntity() bool {
-	return true
+func (j *Job) GetId() string {
+	return j.ID
 }

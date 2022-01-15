@@ -1,0 +1,5 @@
+*.exe
+*.out
+*.html
+*.db
+.DS_Store

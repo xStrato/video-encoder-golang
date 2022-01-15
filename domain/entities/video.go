@@ -24,6 +24,6 @@ func NewVideo(rID, file string) *Video {
 	}
 }
 
-func (v *Video) IsEntity() bool {
-	return true
+func (v *Video) GetId() string {
+	return v.ID
 }
