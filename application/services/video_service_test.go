@@ -29,15 +29,22 @@ func TestVideoServiceMethods(t *testing.T) {
 	}
 	encoderContext := contexts.NewEncoderContext(db)
 	encoderContext.RunMigrations()
-	// jobRepo := repositories.NewJobRepository(encoderContext)
 	videoRepo := repositories.NewVideoRepository(encoderContext)
-	video := entities.NewVideo(uuid.NewV4().String(), "game-progress-mechanics.mp4")
+	video := entities.NewVideo(uuid.NewV4().String(), "video_download_test.mp4")
+	videoService := services.NewVideoService(video, *videoRepo)
 
 	t.Run("Download_ValidJVideoServiceStruct_ShouldNotReturnError", func(t *testing.T) {
 		//Arrange
-		videoService := services.NewVideoService(video, *videoRepo)
 		//Act
 		err := videoService.Download("video-encoder-golang")
+		//Assert
+		require.Nil(t, err)
+	})
+
+	t.Run("Fragment_ValidJVideoServiceStruct_ShouldNotReturnError", func(t *testing.T) {
+		//Arrange
+		//Act
+		err := videoService.Fragment()
 		//Assert
 		require.Nil(t, err)
 	})

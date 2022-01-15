@@ -59,8 +59,8 @@ func (vs *VideoService) Fragment() error {
 
 	source := fmt.Sprintf(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.video.ID, ".mp4")
 	target := fmt.Sprintf(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.video.ID, ".frag")
-
 	cmd := exec.CommandContext(context.Background(), "mp4fragment", source, target)
+
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return err
