@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
 
 	"cloud.google.com/go/storage"
 	"github.com/xStrato/video-encoder-golang/domain/entities"
@@ -47,5 +48,25 @@ func (vs *VideoService) Download(bucketName string) error {
 		return err
 	}
 	log.Printf("video '%v' has been stored", vs.Video.ID)
+	return nil
+}
+
+func (vs *VideoService) Fragment() error {
+	path := fmt.Sprintf(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.Video.ID)
+	if err := os.Mkdir(path, os.ModePerm); err != nil {
+		return err
+	}
+
+	source := fmt.Sprintf(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.Video.ID, ".mp4")
+	target := fmt.Sprintf(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.Video.ID, ".frag")
+
+	cmd := exec.CommandContext(context.Background(), "mp4fragment", source, target)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return err
+	}
+	if len(output) > 0 {
+		log.Printf("=====> Output: %s\n", string(output))
+	}
 	return nil
 }
