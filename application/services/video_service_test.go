@@ -33,7 +33,7 @@ func TestVideoServiceMethods(t *testing.T) {
 	video := entities.NewVideo(uuid.NewV4().String(), "video_download_test.mp4")
 	videoService := services.NewVideoService(video, *videoRepo)
 
-	t.Run("Download_ValidJVideoServiceStruct_ShouldNotReturnError", func(t *testing.T) {
+	t.Run("Download_ValidVideoServiceStruct_ShouldNotReturnError", func(t *testing.T) {
 		//Arrange
 		//Act
 		err := videoService.Download("video-encoder-golang")
@@ -41,10 +41,18 @@ func TestVideoServiceMethods(t *testing.T) {
 		require.Nil(t, err)
 	})
 
-	t.Run("Fragment_ValidJVideoServiceStruct_ShouldNotReturnError", func(t *testing.T) {
+	t.Run("Fragment_ValidVideoServiceStruct_ShouldNotReturnError", func(t *testing.T) {
 		//Arrange
 		//Act
 		err := videoService.Fragment()
+		//Assert
+		require.Nil(t, err)
+	})
+
+	t.Run("Encode_ValidVideoServiceStruct_ShouldNotReturnError", func(t *testing.T) {
+		//Arrange
+		//Act
+		err := videoService.Encode()
 		//Assert
 		require.Nil(t, err)
 	})

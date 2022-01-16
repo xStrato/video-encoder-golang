@@ -56,11 +56,46 @@ func (vs *VideoService) Fragment() error {
 	if err := os.Mkdir(path, os.ModePerm); err != nil {
 		return err
 	}
-
-	source := fmt.Sprintf(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.video.ID, ".mp4")
-	target := fmt.Sprintf(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.video.ID, ".frag")
+	source := fmt.Sprint(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.video.ID, ".mp4")
+	target := fmt.Sprint(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.video.ID, ".frag")
 	cmd := exec.CommandContext(context.Background(), "mp4fragment", source, target)
+	return execCommand(cmd)
+}
 
+func (vs *VideoService) Encode() error {
+	cmdArgs := []string{}
+	cmdArgs = append(cmdArgs, fmt.Sprint(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.video.ID, ".frag"))
+	cmdArgs = append(cmdArgs, "--use-segment-timeline")
+	cmdArgs = append(cmdArgs, "-o")
+	cmdArgs = append(cmdArgs, fmt.Sprint(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.video.ID))
+	cmdArgs = append(cmdArgs, "-f")
+	cmdArgs = append(cmdArgs, "--exec-dir")
+	cmdArgs = append(cmdArgs, "/opt/bento4/bin/")
+
+	cmd := exec.CommandContext(context.Background(), "mp4dash", cmdArgs...)
+	return execCommand(cmd)
+}
+func (vs *VideoService) Finish() error {
+	err := os.Remove(fmt.Sprint(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.video.ID, ".mp4"))
+	if err != nil {
+		log.Println("error removing mp4: ", vs.video.ID, ".mp4")
+		return err
+	}
+	err = os.Remove(fmt.Sprint(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.video.ID, ".frag"))
+	if err != nil {
+		log.Println("error removing frag: ", vs.video.ID, ".frag")
+		return err
+	}
+	err = os.RemoveAll(fmt.Sprint(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.video.ID))
+	if err != nil {
+		log.Println("error removing dir: ", vs.video.ID)
+		return err
+	}
+	log.Println("files have been removed at:", vs.video.ID)
+	return nil
+}
+
+func execCommand(cmd *exec.Cmd) error {
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return err
