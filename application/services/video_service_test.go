@@ -32,6 +32,7 @@ func TestVideoServiceMethods(t *testing.T) {
 	videoRepo := repositories.NewVideoRepository(encoderContext)
 	video := entities.NewVideo(uuid.NewV4().String(), "video_download_test.mp4")
 	videoService := services.NewVideoService(video, *videoRepo)
+	defer videoService.Finish()
 
 	t.Run("Download_ValidVideoServiceStruct_ShouldNotReturnError", func(t *testing.T) {
 		//Arrange

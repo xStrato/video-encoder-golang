@@ -37,6 +37,7 @@ func TestUploadServiceMethods(t *testing.T) {
 	videoService.Download("video-encoder-golang")
 	videoService.Fragment()
 	videoService.Encode()
+	defer videoService.Finish()
 
 	t.Run("ProcessUpload_ValidUploadService_ShouldNotReturnError", func(t *testing.T) {
 		//Arrange
@@ -47,6 +48,7 @@ func TestUploadServiceMethods(t *testing.T) {
 		//Act
 		uploadService.ProcessUpload(20, done)
 		result := <-done
+		videoService.Finish()
 		//Assert
 		require.Equal(t, result, "upload completed")
 	})
