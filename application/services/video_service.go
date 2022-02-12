@@ -61,7 +61,7 @@ func (vs *VideoService) Fragment() error {
 	cmd := exec.CommandContext(context.Background(), "mp4fragment", source, target)
 	return execCommand(cmd)
 }
-
+ 
 func (vs *VideoService) Encode() error {
 	cmdArgs := []string{}
 	cmdArgs = append(cmdArgs, fmt.Sprint(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.video.ID, ".frag"))
