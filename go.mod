@@ -3,7 +3,9 @@ module github.com/xStrato/video-encoder-golang
 go 1.17
 
 require (
+	cloud.google.com/go/storage v1.18.2
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
+	github.com/joho/godotenv v1.4.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.7.0
 	gorm.io/driver/sqlite v1.2.6
@@ -12,7 +14,6 @@ require (
 
 require (
 	cloud.google.com/go v0.97.0 // indirect
-	cloud.google.com/go/storage v1.18.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
@@ -20,7 +21,6 @@ require (
 	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.4 // indirect
-	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.9 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
