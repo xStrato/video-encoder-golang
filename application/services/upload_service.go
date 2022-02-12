@@ -13,18 +13,21 @@ import (
 	"cloud.google.com/go/storage"
 )
 
-type VideoManager struct {
+type UploadService struct {
 	Paths        []string
 	VideoPath    string
 	OutputBucket string
 	Errors       []string
 }
 
-func NewVideoManager() *VideoManager {
-	return &VideoManager{}
+func NewUploadService(output, path string) *UploadService {
+	return &UploadService{
+		OutputBucket: output,
+		VideoPath:    path,
+	}
 }
 
-func (v *VideoManager) UploadObject(objPath string, client *storage.Client, ctx context.Context) error {
+func (v *UploadService) UploadObject(objPath string, client *storage.Client, ctx context.Context) error {
 	path := strings.Split(objPath, os.Getenv("LOCAL_STORAGE_PATH")+"/")
 
 	f, err := os.Open(objPath)
@@ -44,7 +47,7 @@ func (v *VideoManager) UploadObject(objPath string, client *storage.Client, ctx 
 	return nil
 }
 
-func (v *VideoManager) loadPaths() error {
+func (v *UploadService) loadPaths() error {
 	err := filepath.Walk(v.VideoPath, func(path string, info fs.FileInfo, err error) error {
 		if !info.IsDir() {
 			v.Paths = append(v.Paths, path)
@@ -56,7 +59,7 @@ func (v *VideoManager) loadPaths() error {
 	}
 	return nil
 }
-func (v *VideoManager) getUploadClient() (*storage.Client, context.Context, error) {
+func (v *UploadService) getUploadClient() (*storage.Client, context.Context, error) {
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
 	if err != nil {
@@ -65,7 +68,7 @@ func (v *VideoManager) getUploadClient() (*storage.Client, context.Context, erro
 	return client, ctx, nil
 }
 
-func (v *VideoManager) ProcessUpload(concurrency int, done chan string) error {
+func (v *UploadService) ProcessUpload(concurrency int, done chan string) error {
 	in := make(chan int, runtime.NumCPU())
 	out := make(chan string)
 
@@ -97,7 +100,7 @@ func (v *VideoManager) ProcessUpload(concurrency int, done chan string) error {
 	return nil
 }
 
-func (v *VideoManager) worker(in chan int, out chan string, client *storage.Client, ctx context.Context) {
+func (v *UploadService) worker(in chan int, out chan string, client *storage.Client, ctx context.Context) {
 	for index := range in {
 		err := v.UploadObject(v.Paths[index], client, ctx)
 		if err != nil {
