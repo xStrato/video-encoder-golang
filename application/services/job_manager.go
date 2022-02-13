@@ -17,7 +17,7 @@ import (
 type JobManager struct {
 	dbContext contexts.EncoderContext
 	job       entities.Job
-	inputs    chan amqp.Delivery
+	input     chan amqp.Delivery
 	output    chan common.JobWorkerResult
 	rabbitMQ  *queue.RabbitMQ
 }
@@ -26,7 +26,7 @@ func NewJobManager(c contexts.EncoderContext, i chan amqp.Delivery, o chan commo
 	return &JobManager{
 		dbContext: c,
 		job:       entities.Job{},
-		inputs:    i,
+		input:     i,
 		output:    o,
 		rabbitMQ:  r,
 	}
@@ -43,7 +43,7 @@ func (j *JobManager) Start() error {
 		return err
 	}
 
-	jobWorker := NewJobWorker(j.inputs, j.output, jobService)
+	jobWorker := NewJobWorker(j.input, j.output, jobService)
 	for thread := 0; thread < workers; thread++ {
 		go jobWorker.Start(thread)
 	}

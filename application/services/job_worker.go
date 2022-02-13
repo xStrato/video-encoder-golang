@@ -13,21 +13,21 @@ import (
 )
 
 type JobWorker struct {
-	inputs     chan amqp.Delivery
+	input      chan amqp.Delivery
 	out        chan common.JobWorkerResult
 	JobService *JobService
 }
 
-func NewJobWorker(inputs chan amqp.Delivery, out chan common.JobWorkerResult, js *JobService) *JobWorker {
+func NewJobWorker(input chan amqp.Delivery, out chan common.JobWorkerResult, js *JobService) *JobWorker {
 	return &JobWorker{
-		inputs:     inputs,
+		input:      input,
 		out:        out,
 		JobService: js,
 	}
 }
 
 func (j *JobWorker) Start(thread int) {
-	for message := range j.inputs {
+	for message := range j.input {
 		if err := utils.IsJson(string(message.Body)); err != nil {
 			j.out <- *common.NewJobWorkerResult(entities.Job{}, &message, err)
 			continue
