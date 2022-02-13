@@ -61,7 +61,7 @@ func (vs *VideoService) Fragment() error {
 	cmd := exec.CommandContext(context.Background(), "mp4fragment", source, target)
 	return execCommand(cmd)
 }
- 
+
 func (vs *VideoService) Encode() error {
 	cmdArgs := []string{}
 	cmdArgs = append(cmdArgs, fmt.Sprint(os.Getenv("LOCAL_STORAGE_PATH"), "/", vs.video.ID, ".frag"))
@@ -94,7 +94,12 @@ func (vs *VideoService) Finish() error {
 	log.Println("files have been removed at:", vs.video.ID)
 	return nil
 }
-
+func (vs *VideoService) InsertVideo() error {
+	if _, err := vs.videoRepository.Insert(vs.video); err != nil {
+		return err
+	}
+	return nil
+}
 func execCommand(cmd *exec.Cmd) error {
 	output, err := cmd.CombinedOutput()
 	if err != nil {
