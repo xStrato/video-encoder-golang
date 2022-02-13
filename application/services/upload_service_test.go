@@ -32,7 +32,7 @@ func TestUploadServiceMethods(t *testing.T) {
 	encoderContext.RunMigrations()
 	videoRepo := repositories.NewVideoRepository(encoderContext)
 	video := entities.NewVideo(uuid.NewV4().String(), "video_download_test.mp4")
-	videoService := services.NewVideoService(video, *videoRepo)
+	videoService := services.NewVideoServiceWithVideo(video, *videoRepo)
 
 	videoService.Download("video-encoder-golang")
 	videoService.Fragment()

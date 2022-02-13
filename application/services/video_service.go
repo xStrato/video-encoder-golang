@@ -18,8 +18,13 @@ type VideoService struct {
 	videoRepository repositories.VideoRepository
 }
 
-func NewVideoService(v *entities.Video, repo repositories.VideoRepository) VideoService {
+func NewVideoServiceWithVideo(v *entities.Video, repo repositories.VideoRepository) VideoService {
 	return VideoService{v, repo}
+}
+func NewVideoService(repo *repositories.VideoRepository) *VideoService {
+	return &VideoService{
+		videoRepository: *repo,
+	}
 }
 
 func (vs *VideoService) Download(bucketName string) error {

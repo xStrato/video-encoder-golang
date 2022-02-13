@@ -26,7 +26,7 @@ func NewJobWorker(inputs chan amqp.Delivery, out chan common.JobWorkerResult, js
 	}
 }
 
-func (j *JobWorker) Start(job *entities.Job) {
+func (j *JobWorker) Start(thread int) {
 	for message := range j.inputs {
 		if err := utils.IsJson(string(message.Body)); err != nil {
 			j.out <- *common.NewJobWorkerResult(entities.Job{}, &message, err)
