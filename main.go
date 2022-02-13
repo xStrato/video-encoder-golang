@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/joho/godotenv"
+	"github.com/xStrato/video-encoder-golang/infrastructure/cmd"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -20,5 +21,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	println(db)
+	cmd.StartServer(db)
 }

@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"os"
+	"sync"
 	"time"
 
 	uuid "github.com/satori/go.uuid"
@@ -15,14 +16,16 @@ import (
 type JobWorker struct {
 	input      chan amqp.Delivery
 	out        chan common.JobWorkerResult
-	JobService *JobService
+	jobService *JobService
+	mutex      sync.Mutex
 }
 
 func NewJobWorker(input chan amqp.Delivery, out chan common.JobWorkerResult, js *JobService) *JobWorker {
 	return &JobWorker{
 		input:      input,
 		out:        out,
-		JobService: js,
+		jobService: js,
+		mutex:      sync.Mutex{},
 	}
 }
 
@@ -33,36 +36,36 @@ func (j *JobWorker) Start(thread int) {
 			continue
 		}
 
-		if err := json.Unmarshal(message.Body, &j.JobService.Job.Video); err != nil {
+		if err := json.Unmarshal(message.Body, &j.jobService.Job.Video); err != nil {
 			j.out <- *common.NewJobWorkerResult(entities.Job{}, &message, err)
 			continue
 		}
-		j.JobService.Job.Video.ID = uuid.NewV4().String()
+		j.jobService.Job.Video.ID = uuid.NewV4().String()
 
-		if err := j.JobService.Job.Video.IsValid(); err != nil {
-			j.out <- *common.NewJobWorkerResult(entities.Job{}, &message, err)
-			continue
-		}
-
-		if err := j.JobService.VideoService.InsertVideo(); err != nil {
+		if err := j.jobService.Job.Video.IsValid(); err != nil {
 			j.out <- *common.NewJobWorkerResult(entities.Job{}, &message, err)
 			continue
 		}
 
-		j.JobService.Job.OutputBucket = os.Getenv("OUTPUT_BUCKET_NAME")
-		j.JobService.Job.ID = uuid.NewV4().String()
-		j.JobService.Job.Status = "STARTING"
-		j.JobService.Job.CreatedAt = time.Now()
-
-		if _, err := j.JobService.JobRepo.Insert(j.JobService.Job); err != nil {
+		if err := j.jobService.VideoService.InsertVideo(); err != nil {
 			j.out <- *common.NewJobWorkerResult(entities.Job{}, &message, err)
 			continue
 		}
 
-		if err := j.JobService.Start(); err != nil {
+		j.jobService.Job.OutputBucket = os.Getenv("OUTPUT_BUCKET_NAME")
+		j.jobService.Job.ID = uuid.NewV4().String()
+		j.jobService.Job.Status = "STARTING"
+		j.jobService.Job.CreatedAt = time.Now()
+
+		if _, err := j.jobService.JobRepo.Insert(j.jobService.Job); err != nil {
 			j.out <- *common.NewJobWorkerResult(entities.Job{}, &message, err)
 			continue
 		}
-		j.out <- *common.NewJobWorkerResult(*j.JobService.Job, &message, nil)
+
+		if err := j.jobService.Start(); err != nil {
+			j.out <- *common.NewJobWorkerResult(entities.Job{}, &message, err)
+			continue
+		}
+		j.out <- *common.NewJobWorkerResult(*j.jobService.Job, &message, nil)
 	}
 }
