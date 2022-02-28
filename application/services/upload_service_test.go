@@ -24,6 +24,7 @@ func init() {
 }
 
 func TestUploadServiceMethods(t *testing.T) {
+
 	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
