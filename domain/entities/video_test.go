@@ -16,7 +16,7 @@ func TestVideoStructValidations(t *testing.T) {
 		//Act
 		err := video.IsValid()
 		//Assert
-		require.Error(t, err)
+		require.NoError(t, err)
 	})
 
 	t.Run("IsValid_InvalidUUID_ShouldReturnError", func(t *testing.T) {
