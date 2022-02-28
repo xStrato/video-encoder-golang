@@ -35,6 +35,6 @@ func TestVideoStructValidations(t *testing.T) {
 		//Act
 		err := video.IsValid()
 		//Assert
-		require.Nil(t, err)
+		require.NotNil(t, err)
 	})
 }
